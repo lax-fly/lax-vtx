@@ -1,0 +1,23 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Cortex Debug",
+            "cwd": "${workspaceFolder}",
+            "executable": "${workspaceFolder}/makefile/build/at32f421.elf", // 飞控生成的elf文件路径
+            "request": "launch",
+            "type": "cortex-debug",
+            "runToEntryPoint": "main",
+            "device": "-at32f421g8u7",    // 飞控板主控芯片
+            "interface": "swd",         // 调试器连接方式
+            "servertype": "jlink",      // 采用stlink连接
+            "serverpath": "C:/Program Files/SEGGER/JLink/JLinkGDBServerCL.exe",
+            "svdFile": "${workspaceFolder}/svd/AT32F421xx_v2.svd",
+            //"armToolchainPath": "/root/betaflight/tools/gcc-arm-none-eabi-10.3-2021.10/bin",
+            "showDevDebugOutput": "raw"
+        }
+    ]
+}
