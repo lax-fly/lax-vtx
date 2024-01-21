@@ -1,5 +1,8 @@
 #ifdef USE_PA_RFPA5542
 
+#include "helpers.h"
+#include "clock.h"
+
 #include "rfpa5542.h"
 #include "assert.h"
 
@@ -48,7 +51,7 @@ int PA5542::set_amp(uint32_t vpd_set)
 
     if (real_vpd > vpd_set + 20)
     {
-        if (pwm_val < 9000)
+        if (pwm_val < 10000)
         {
             pwm_val += 100;
             pwm_out_write(outputPowerTimer, pwm_val);
@@ -56,13 +59,19 @@ int PA5542::set_amp(uint32_t vpd_set)
     }
     else if (real_vpd < vpd_set - 20)
     {
-        if (pwm_val > 7000)
+        if (pwm_val > 9000)
         {
             pwm_val -= 100;
             pwm_out_write(outputPowerTimer, pwm_val);
         }
     }
-    pwm_out_write(outputPowerTimer, 9000);
+    // static uint32_t time = 0;
+    // if (get_ms() > time)
+    // {
+    //     time = get_ms() + 1000;
+    //     debug("vpd/pwm: %lu %lu", real_vpd, pwm_val);
+    // }
+    pwm_out_write(outputPowerTimer, pwm_val);
     return 0;
 }
 

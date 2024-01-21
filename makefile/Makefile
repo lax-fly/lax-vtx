@@ -31,7 +31,7 @@ LDSCRIPT := ../startup/gcc/linker/$(MCU_FLY)_flash.ld
 # building variables
 ######################################
 # debug build?
-DEBUG = 1
+DEBUG ?= 1
 # optimization
 OPT = -Og
 
@@ -146,6 +146,8 @@ CFLAGS += $(MCU) $(C_DEFS) $(OPT) -Wall -fdata-sections -ffunction-sections
 
 ifeq ($(DEBUG), 1)
 CFLAGS += -g -gdwarf-2
+else
+CFLAGS += -DNDEBUG
 endif
 
 # Generate dependency information

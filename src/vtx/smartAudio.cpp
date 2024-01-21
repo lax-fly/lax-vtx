@@ -279,6 +279,7 @@ void smartaudioProcessModePacket(void)
         /* Enable pitmode */
         if (g_config.pitmodeOutRange)   // make compatibility for SA2.0
         {
+            g_config.pitmodeFreq = 5584;
             radio.set_freq(5584);   // solidly use 5584MHz in pitmodeOutRange mode
         }
         radio.set_power(RACE_MODE_POWER);

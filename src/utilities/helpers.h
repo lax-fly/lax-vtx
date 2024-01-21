@@ -10,8 +10,9 @@
 #define bitWrite(value, bit, bitvalue) (bitvalue ? bitSet(value, bit) : bitClear(value, bit))
 #define bitRead(value, bit) (((value) >> (bit)) & 0x01)
 
-#if NDEBUG == 1
+#ifdef NDEBUG
 #define debug(fmt, args...)
+#define debug_r(fmt, args...)
 #else
 #define debug(fmt, args...) printf(fmt "\n", ##args)            // output happens util a '\n'
 #define debug_r(fmt, args...) fprintf(stderr, fmt, ##args)      // output immediately

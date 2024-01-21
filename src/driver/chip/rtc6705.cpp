@@ -25,6 +25,14 @@
 #define WRITE_BIT 0x01
 
 #define SYNTH_REG_A_DEFAULT 0x0190
+#define SYNTH_REG_B_DEFAULT 0x047981
+#define SYNTH_REG_C_DEFAULT 0x090045
+#define VCO_DFC_REG_DEFAULT 0xFFDF
+#define VCO1_REG_DEFAULT 0x78000
+#define VCO2_REG_DEFAULT 0xA0000
+#define AUDIO_REG_DEFAULT 0x1DEEF
+#define PA_REG_DEFAULT 0x4FBD
+#define STATE_REG_DEFAULT 0x0
 #define POWER_AMP_ON 0X4FBF // 0b100111110111111
 
 #define PLL_SETTLE_TIME 5
@@ -40,11 +48,18 @@ int RTC6705::init(ChipId id)
     sck_pin = gpio_out_setup(RTC6705_1_SPI_CLOCK, 0);
     mosi_pin = gpio_out_setup(RTC6705_1_SPI_MOSI, 0);
 
-    write_reg(StateRegister, 0);
     write_reg(SynthesizerRegisterA, SYNTH_REG_A_DEFAULT);
     // check if chip exists
     if (read_reg(SynthesizerRegisterA) == SYNTH_REG_A_DEFAULT)
     {
+        write_reg(SynthesizerRegisterB, SYNTH_REG_B_DEFAULT);
+        write_reg(SynthesizerRegisterC, SYNTH_REG_C_DEFAULT);
+        write_reg(RFVCODFCControlRegister, VCO_DFC_REG_DEFAULT);
+        write_reg(VCOControlRegister1, VCO1_REG_DEFAULT);
+        write_reg(VCOControlRegister2, VCO2_REG_DEFAULT);
+        write_reg(AudioModulatorControlRegister, AUDIO_REG_DEFAULT);
+        write_reg(PredriverandPAControlRegister, PA_REG_DEFAULT);
+        write_reg(StateRegister, STATE_REG_DEFAULT);
         power_off();
         return 0;
     }
@@ -131,21 +146,11 @@ void RTC6705::write_reg(uint8_t addr, uint32_t data)
 
 void RTC6705::power_on(void)
 {
-    uint32_t pa_reg_v = read_reg(PredriverandPAControlRegister);
-
-    if (pa_reg_v == POWER_AMP_ON)
-        return;
-
     write_reg(PredriverandPAControlRegister, POWER_AMP_ON);
 }
 
 void RTC6705::power_off(void)
 {
-    uint32_t pa_reg_v = read_reg(PredriverandPAControlRegister);
-
-    if (pa_reg_v == 0)
-        return;
-
     write_reg(PredriverandPAControlRegister, 0);
 }
 // newFreq: unit MHz
@@ -157,22 +162,10 @@ int RTC6705::set_freq(uint32_t newFreq)
     uint32_t SYN_RF_A_REG = freq % 64;
 
     uint32_t newRegData = SYN_RF_A_REG | (SYN_RF_N_REG << 7);
-    uint32_t syn_reg_b = read_reg(SynthesizerRegisterB);
-
-    if (newRegData == syn_reg_b)
-        return 0;
-
-    /* Switch off */
-    power_off();
 
     write_reg(SynthesizerRegisterA, SYNTH_REG_A_DEFAULT);
-
     /* Set frequency */
     write_reg(SynthesizerRegisterB, newRegData);
-
-    // wait for pll to settle
-    delay_ms(PLL_SETTLE_TIME);
-    power_on();
 
     return 0;
 }

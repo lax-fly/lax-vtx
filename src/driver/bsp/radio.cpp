@@ -150,17 +150,13 @@ uint16_t Radio::bilinearInterpolation(float dbm)
 int Radio::set_freq(uint32_t freq)
 {
     int res = TO_RFMODCHIP(m_mod_handle)->set_freq(freq);
-    // print_chip_regs();
+    print_chip_regs();
     return res;
 }
 
 int Radio::set_power(uint32_t dbm)
 {
     m_power_dbm = dbm;
-    if (dbm == 0)
-    {
-        TO_RFMODCHIP(m_mod_handle)->set_power(0);
-    }
 
     if (dbm < 10)
     {
@@ -174,7 +170,7 @@ int Radio::set_power(uint32_t dbm)
     {
         m_vpd_set = bilinearInterpolation(dbm);
     }
-
+    TO_RFMODCHIP(m_mod_handle)->set_power(dbm);
     return 0;
 }
 

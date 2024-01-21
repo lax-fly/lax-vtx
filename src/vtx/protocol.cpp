@@ -15,6 +15,7 @@ namespace Protocol
     void b1_short_press_cb(void *);
     void b1_long_press_cb(void *);
     void b1_long10s_press_cb(void *);
+    void protocol_switch(vtxMode_e mode);
 };
 
 void Protocol::b1_short_press_cb(void *)
@@ -50,6 +51,28 @@ void Protocol::b1_long10s_press_cb(void *)
 
 void Protocol::init(vtxMode_e mode)
 {
+    protocol_switch(mode);
+    button_1.open(DEV_ID_BUTTON1);
+    button_1.register_event_callback(Button::SHORT_PRESS, b1_short_press_cb, NULL);
+    button_1.register_event_callback(Button::LONG_PRESS_1S, b1_long_press_cb, NULL);
+    button_1.register_event_callback(Button::LONG_PRESS_10S, b1_long10s_press_cb, NULL);
+    if (g_config.pitMode)
+    {
+        radio.set_power(0);
+        radio.set_freq(g_config.pitmodeFreq);
+    }
+    else
+    {
+        radio.set_power(g_config.currPowerdB);
+        if (g_config.freqMode)
+            radio.set_freq(g_config.currFreq);
+        else
+            radio.set_freq(getFreqByIdx(g_config.channel));
+    }
+}
+
+void Protocol::protocol_switch(vtxMode_e mode)
+{
     uint32_t baud, stopbits;
 
     serial_1.close();
@@ -76,10 +99,6 @@ void Protocol::init(vtxMode_e mode)
         break;
     }
     serial_1.open(DEV_ID_USART1, baud, stopbits);
-    button_1.open(DEV_ID_BUTTON1);
-    button_1.register_event_callback(Button::SHORT_PRESS, b1_short_press_cb, NULL);
-    button_1.register_event_callback(Button::LONG_PRESS_1S, b1_long_press_cb, NULL);
-    button_1.register_event_callback(Button::LONG_PRESS_10S, b1_long10s_press_cb, NULL);
 }
 
 void Protocol::poll(void)
@@ -112,7 +131,7 @@ void Protocol::poll(void)
             led_r.blink(1, 50);
             frame_err = 0; // avoid overflow
             mode = (vtxMode_e)((mode + 1) % VTX_MODE_MAX);
-            Protocol::init((vtxMode_e)mode);
+            Protocol::protocol_switch((vtxMode_e)mode);
             g_config.vtxMode = BUTTON;
         }
         break;

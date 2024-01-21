@@ -105,17 +105,10 @@ on the other hand, keil is intended for mcu while gcc is not mainly for mcu
     }
     int _read(int file, char *ptr, int len)
     {
-        return 0;
+        return debug_serial.recv((uint8_t*)ptr, len);
     }
     int _write(int file, char *ptr, int len)
     {
-        static uint8_t is_out_ready = 0;
-        if (is_out_ready == 0)
-        {
-            is_out_ready = 1;
-            if (0 != debug_serial.open(DEV_ID_USART2, 256000))
-                assert(false);
-        }
         debug_serial.send((uint8_t *)ptr, len, 1);
         return len;
     }

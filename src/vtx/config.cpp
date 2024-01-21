@@ -4,6 +4,33 @@
 #define CONF_POLL_INTERVAL 100;
 Config g_config;
 
+static inline void print_config(const Config& config)
+{
+    debug("\n"
+          "version:        %d\n"
+          "vtxMode:        %d\n"
+          "currFreq:       %d\n"
+          "channel:        %d\n"
+          "freqMode:       %d\n"
+          "pitMode:        %d\n"
+          "pitmodeInRange: %d\n"
+          "pitmodeOutRange:%d\n"
+          "pitmodeFreq:    %d\n"
+          "currPowerdB:    %d\n"
+          "unlocked:       %d\n",
+          config.version,
+          config.vtxMode,
+          config.currFreq,
+          config.channel,
+          config.freqMode,
+          config.pitMode,
+          config.pitmodeInRange,
+          config.pitmodeOutRange,
+          config.pitmodeFreq,
+          config.currPowerdB,
+          config.unlocked);
+};
+
 int Config::load(void)
 {
     g_disk.read(0, (uint8_t *)&g_config, sizeof(g_config));
@@ -12,6 +39,7 @@ int Config::load(void)
     {
         return loaddefault();
     }
+    print_config(*this);
     return 0;
 }
 
@@ -35,28 +63,6 @@ int Config::save(void)
 {
     g_disk.write(0, (uint8_t *)&g_config, sizeof(g_config));
     led_r.blink(4, 80);
-    debug("\n"
-          "version:        %d\n"
-          "vtxMode:        %d\n"
-          "currFreq:       %d\n"
-          "channel:        %d\n"
-          "freqMode:       %d\n"
-          "pitMode:        %d\n"
-          "pitmodeInRange: %d\n"
-          "pitmodeOutRange:%d\n"
-          "pitmodeFreq:    %d\n"
-          "currPowerdB:    %d\n"
-          "unlocked:       %d\n",
-          g_config.version,
-          g_config.vtxMode,
-          g_config.currFreq,
-          g_config.channel,
-          g_config.freqMode,
-          g_config.pitMode,
-          g_config.pitmodeInRange,
-          g_config.pitmodeOutRange,
-          g_config.pitmodeFreq,
-          g_config.currPowerdB,
-          g_config.unlocked);
+    print_config(*this);
     return 0;
 }
